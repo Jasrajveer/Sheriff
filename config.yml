@@ -1,0 +1,36 @@
+project_1-jira:
+  type: 'jira'
+  host: "some:host"
+  user: ""
+  passwd: ""
+  project: "DSS"
+  component: "Some Pipeline component"
+  issue_level: "Production Support"
+  default_email_list: ""
+  database_email_list: "pipeline_failure"
+project_2-jira:
+  type: 'jira'
+  host: ""
+  user: ""
+  passwd: ""
+  project: ""
+  component: ""
+  issue_level: "Production Support"
+  default_email_list: ""
+  database_email_list: "pipeline"
+project_3-jira:
+  type: ''
+  host: ''
+  user: ""
+  passwd: ''
+  project: ''
+  component: ""
+  issue_level: ""
+  default_email_list: ""
+  database_email_list: ""
+mnt-issue_log:
+  type: 'log_file'
+  path: 'path to store stats and log'
+  component: 'mnt-issue_log'
+  default_email_list: ""
+  database_email_list: "" 
