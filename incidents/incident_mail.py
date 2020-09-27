@@ -9,7 +9,7 @@ class Incident_mail():
         self.summary = str(summary)
         self.description = description
 
-        response = requests.get('https://random.com/emails/email_list?list_name=' + database_email_group)
+        response = requests.get('some web address here' + database_email_group)
         if response.status_code == 200:
             if response.text != 'Error: list name not selected':
                 self.email_group = response.text
@@ -19,11 +19,12 @@ class Incident_mail():
             self.email_group = default_email_group
 
     def send_mail(self):
-        cmd = "echo " + self.description + " | mail -s " + self.summary  + " " + self.email_group
-        #print(self.email_group)
-        #print(cmd)
-        try:
-            os.system(cmd)
-        except Exception as e:
-            print(e)
+        if self.email_group == "":
+            print("No email specified or pulled.")
+        else:
+            cmd = "echo " + self.description + " | mail -s " + self.summary  + " " + self.email_group
+            try:
+                os.system(cmd)
+            except Exception as e:
+                print(e)
 

@@ -4,8 +4,8 @@ read the config file, and based on what is specified create issues to track. The
 contains the platforms and the complementary information based on what needs to be specified for
 that platform. There are options including summary, description, and component, which are needed
 for creating the issue."""
+
 import argparse
-import sys
 from incidents.controller import Controller
 
 def main():
@@ -15,7 +15,7 @@ def main():
     parser.add_argument('-s', '--summary', required=True, help='Summary for the issue/ticket.')
     parser.add_argument('-c', '--config', required=True, help='Path to config file.')
     parser.add_argument('-u', '--upload_file', help='Path to file for uploading to jira ticket.')
-    parser.add_argument('-p', '--project_name', nargs='+',required=True, help='Project name for preset information in Config.')
+    parser.add_argument('-p', '--project_name', nargs='+', required=True, help='Project name for preset information in Config.')
     args = parser.parse_args()
 
     try:
