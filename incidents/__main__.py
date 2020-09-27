@@ -13,13 +13,13 @@ def main():
     parser = argparse.ArgumentParser(description='Gather all information for creating a ticket.')
     parser.add_argument('-d', '--description', help='Description of the failure/error.')
     parser.add_argument('-s', '--summary', required=True, help='Summary for the issue/ticket.')
-    parser.add_argument('-p', '--path', required=True, help='Path to config file.')
+    parser.add_argument('-c', '--config', required=True, help='Path to config file.')
     parser.add_argument('-u', '--upload_file', help='Path to file for uploading to jira ticket.')
-    parser.add_argument('-n', '--project_name', nargs='+',required=True, help='Project name for preset information in Config.')
+    parser.add_argument('-p', '--project_name', nargs='+',required=True, help='Project name for preset information in Config.')
     args = parser.parse_args()
 
     try:
-        Controller(config=args.path, description=args.description, summary=args.summary,
+        Controller(config=args.config, description=args.description, summary=args.summary,
         upload=args.upload_file, groups=args.project_name).load_platform()
     except Exception as e:
         print(e)

@@ -1,23 +1,32 @@
-project_1-jira:
+jira_project:
   type: 'jira'
-  host: "some:host"
-  user: ""
-  passwd: ""
-  project: "DSS"
+  host: "host name"
+  user: "username"
+  passwd: "Password"
+  api_key: "API_key"
+  project: "Project key"
   component: "Some Pipeline component"
-  issue_level: "Production Support"
+  issue_level: "Task"
+  assign_to: "Set assignee for the ticket or set default within Jira prroject."
+  priority: "Medium"
+  default_email_list: "Set a default email to use if you get nothing back from email."
+  database_email_list: "database endpoint that returns a list of emails."
+mnt-issue_log:
+  type: 'log_file'
+  path: 'path to store stats and log'
+  component: ''
   default_email_list: ""
-  database_email_list: "pipeline_failure"
+  database_email_list: ""
 project_2-jira:
-  type: 'jira'
+  type: ''
   host: ""
   user: ""
   passwd: ""
   project: ""
   component: ""
-  issue_level: "Production Support"
+  issue_level: ""
   default_email_list: ""
-  database_email_list: "pipeline"
+  database_email_list: ""
 project_3-jira:
   type: ''
   host: ''

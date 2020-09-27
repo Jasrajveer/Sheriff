@@ -2,9 +2,9 @@ import setuptools
 
 setuptools.setup(
         name='incidents',
-        version='1.0',
+        version='1.0.0',
         author='Jasrajveer Malhi',
-        description="Packages for using Jira platform api.",
+        description="Tool for automating tickets on multiple platforms. Packages inxluded for using Jira platform api.",
         python_requires='>3.6.0',
         packages=setuptools.find_packages(),
         include_package_data=True,

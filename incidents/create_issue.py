@@ -10,18 +10,31 @@ logging.basicConfig(level=logging.DEBUG)
 class Ticket(object):
     """Class responisble for creating ticket/issue on specified platform."""
     def __init__(self, **kwargs):
-        #Initialize the allowed_keys as False.
         #Update the allowed_keys with the values passed from __main__.py.
         allowed_keys = {'config_info', 'group_name', 'description', 'summary', 'upload', 'user'}
         self.__dict__.update((key, False) for key in allowed_keys)
         self.__dict__.update((key, value) for key, value in kwargs.items() if key in allowed_keys)
         self.priority = 'Top'
         self.real_groups = ('project_1-jira', 'project_2-jira', 'project_3-jira', 'mnt-issue_log')
-        #Connecting to jira api using JIRA-python package.
-        try:
-            self.jira = JIRA(self.config_info[self.group_name]['host'], auth=(self.config_info[self.group_name]['user'],self.config_info[self.group_name]['passwd']))
-        except Exception as e:
-            print(e)
+
+
+        jira_cloud = 'atlassian.net'
+        host_name = str(self.config_info[self.group_name]['host'])
+
+        #Connect to Jira service.
+        if jira_cloud in host_name:
+            print(self.config_info[self.group_name]['host'])
+            try:
+                self.jira = JIRA(self.config_info[self.group_name]['host'] ,basic_auth=(self.config_info[self.group_name]['user'], self.config_info[self.group_name]['api_key']))
+                print("Connecting to JIRA cloud.")
+            except Exception as e:
+                print(e)
+        else:
+            try:
+                self.jira = JIRA(self.config_info[self.group_name]['host'], auth=(self.config_info[self.group_name]['user'],self.config_info[self.group_name]['passwd']))
+                print("Connecting to Jira Server.")
+            except Exception as e:
+                print(e)
 
     def create_jira_Ticket(self):
         """Creating jira ticket."""
@@ -32,14 +45,14 @@ class Ticket(object):
                 'summary': self.config_info[self.group_name]['component'] + ' - ' + self.summary ,
                 'description': self.description,
                 'issuetype': {'name': self.config_info[self.group_name]['issue_level']},
-                'priority': {'name': 'Top'},
-                'components': [{'name': self.config_info[self.group_name]['component']}],
+                'priority': {'name': self.config_info[self.group_name]['priority']},
+                #'components': [{'name': self.config_info[self.group_name]['component']}],
                     }
 
         #Creating the actual ticket.
         try:
             jira_issue = self.jira.create_issue(fields=issue_fields)
-            asigned_to = self.jira.assign_issue(jira_issue, self.config_info[self.group_name]['user'])
+            #asigned_to = self.jira.assign_issue(jira_issue, self.config_info[self.group_name]['assign_to'])
             print("Jirra issue: {}".format(jira_issue))
         except Exception as e:
             print(e)
