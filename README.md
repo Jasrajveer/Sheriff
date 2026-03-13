@@ -80,8 +80,10 @@ Sheriff uses a YAML file with named groups. Each group has a `type` (for example
 
 ### CLI
 
-``` incidents -h 
 ```
+incidents -h
+```
+
 Expected options:
 
 - `-s, --summary` (required): short incident summary.
