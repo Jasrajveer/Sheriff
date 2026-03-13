@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: incidents
+Version: 1.0.0
+Summary: Tool for automating tickets on multiple platforms. Packages inxluded for using Jira platform api.
+Author: Jasrajveer Malhi
+Requires-Python: >3.6.0
+Requires-Dist: pyyaml
+Requires-Dist: jira
+Requires-Dist: argparse
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

@@ -1,0 +1,2 @@
+[console_scripts]
+incidents = incidents.__main__:main
