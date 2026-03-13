@@ -18,11 +18,15 @@ def main():
     parser.add_argument('-p', '--project_name', nargs='+', required=True, help='Project name for preset information in Config.')
     args = parser.parse_args()
 
-    try:
-        Controller(config=args.config, description=args.description, summary=args.summary,
-        upload=args.upload_file, groups=args.project_name).load_platform()
-    except Exception as e:
-        print(e)
+
+    Controller(
+            config=args.config,
+            description=args.description,
+            summary=args.summary,
+            upload=args.upload_file,
+            groups=args.project_name
+            ).load_platform()
+
 
 if __name__ == "__main__":
     main()

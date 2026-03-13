@@ -2,6 +2,9 @@
 
 from jira import JIRA
 
+class TicketError(Exception):
+    """Raised when ticket creation or upload fails. """
+
 class Ticket(object):
     """Class responisble for creating ticket/issue on specified platform."""
     def __init__(self, **kwargs):
@@ -22,13 +25,13 @@ class Ticket(object):
                 self.jira = JIRA(self.config_info[self.group_name]['host'], basic_auth=(self.config_info[self.group_name]['user'], self.config_info[self.group_name]['api_key']))
                 print("Connecting to JIRA cloud.")
             except Exception as e:
-                print(e)
+                raise TicketError(f'Unable to connect to Jira Cloud: {e}') from e
         else:
             try:
                 self.jira = JIRA(self.config_info[self.group_name]['host'], auth=(self.config_info[self.group_name]['user'], self.config_info[self.group_name]['passwd']))
                 print("Connecting to Jira Server.")
             except Exception as e:
-                print(e)
+                raise TicketError(f'Unable to connect to Jira Server: {e}') from e
 
     def create_jira_Ticket(self):
         """Creating jira ticket."""
@@ -43,16 +46,15 @@ class Ticket(object):
                     }
 
         #Creating the actual ticket.
+        jira_issue = None
         try:
             jira_issue = self.jira.create_issue(fields=issue_fields)
             print("Jirra issue: {}".format(jira_issue))
         except Exception as e:
-            print(e)
+            raise TicketError(f'Failed to create Jira Issue: {e}') from e
 
         #Check self.upload for file to upload.
-        if not self.upload:
-            pass
-        else:
+        if self.upload and jira_issue:
             self.upload_attachment(jira_issue)
 
     def upload_attachment(self, jira_issue):
@@ -60,4 +62,4 @@ class Ticket(object):
         try:
             self.jira.add_attachment(issue=jira_issue, attachment=self.upload)
         except Exception as e:
-            print(e)
+            raise TicketError(f'Failed to upload attachment: {e}') from e

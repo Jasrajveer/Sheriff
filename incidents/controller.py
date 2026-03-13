@@ -2,14 +2,17 @@
 Controller is responsible for dictating which specific task to run based on user input. Also allows for
 user to import incidents into python scripts.
 """
-import sys
-import os
+
 import requests
+import getpass
 from incidents import parse_config
 from incidents.create_issue import Ticket
 from incidents.makeLog import create_log
 from incidents.stats import Statistics
 from incidents.incident_mail import Incident_mail
+
+class ControllerError(Exception):
+    """Raised when one or more actions fail."""
 
 class Controller(object):
     """Based on user input will create Jira ticket, store in log, or both. The default setting is to always send out an email
@@ -19,29 +22,36 @@ class Controller(object):
         self.__dict__.update((key, False) for key in allowed_keys)
         self.__dict__.update((key, value) for key, value in kwargs.items() if key in allowed_keys)
         self.config_data = parse_config.parse_yaml(self.config)
-        self.user = os.getlogin()
+        self.user = getpass.getuser()
         self.type_dispatch = {
         'jira': self._sendJira,
         'log_file': self._sendLog
         }
 
     def load_platform(self):
+        if not self.groups:
+            raise ControllerError('No groups provided for platform loading.')
+
+        group_errors = []
         for group in self.groups:
             try:
                 #Group name is passed in by user and all info specified within config will be used to create Ticket/Log.
                 self.type_dispatch[self.config_data[group]['type']](specific_group=group)
             except Exception as e:
-                print(e)
+                group_errors.append(f'[{group}] platform dispatch failed: {e}')
             try:
                 #If databse email list is unavailable it will use default email specified in config.
-                self._sendMail(self.config_data[group]['database_email_list'], self.config_data[group]['database_email_list'])
+                self._sendMail(self.config_data[group]['database_email_list'], self.config_data[group]['default_email_list'])
             except Exception as e:
-                print(e)
+                group_errors.append(f'[{group}] email sending failed: {e}')
             try:
                 #Create stat file, currrently supports frequency of failures based on summary input.
                 self._runStat(self.config_data[group]['path'])
             except Exception as e:
-                print(e)
+                group_errors.append(f'[{group}] statistics update failed: {e}')
+
+        if group_errors:
+            raise ControllerError('One or more platform actions failed:\n' + '\n'.join(group_errors))
 
     def _sendJira(self, specific_group):
         #Send information to jira module to create ticket.
@@ -57,13 +67,9 @@ class Controller(object):
         user=self.user)
 
     def _runStat(self, stat_file_path):
-        try:
-            Statistics(stat_file_path, self.summary).write_file()
-        except Exception as e:
-            print(e)
+        #Record statistics regarding errors.
+        Statistics(stat_file_path, self.summary).write_file()
 
     def _sendMail(self, database_email_group, default_email_group):
-        try:
-            Incident_mail(self.summary, self.description, database_email_group, default_email_group).send_mail()
-        except Exception as e:
-            print(e)
+        #Send off email alerts regarding issue.
+        Incident_mail(self.summary, self.description, database_email_group, default_email_group).send_mail()
