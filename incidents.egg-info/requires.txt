@@ -1,3 +1,0 @@
-pyyaml
-jira
-argparse

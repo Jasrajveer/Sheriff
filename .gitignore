@@ -2,3 +2,4 @@
 __pycache__/
 incidents.egg-info/
 *.pyc
+build/
