@@ -1,46 +1,142 @@
-# Introduction
-Sheriff is a tool used for creating issues/tickets on multiple incident tracker platforms such as Jira (cloud and server). Curently supports Jira software and core services, as well as, creating log files on your file system, and email alerts. Can be used as either a command line tool, import as python module, or using system in most languages to execute command. The platforms are specified on the `config.yml` file. You can execute multiple platforms at the same time.
+# Updates
+3-12-26
+Explicit error handling update. Previously was slilently printing errors.
+Improved reliability when using Sheriff for in-service or non-interactive environments.
+Fixed Jira file attachment flow. Ensuring ticket creation before file upload attempt.
+Included config file parsing check.
 
-## Install
-Go into incidents directory and 'run pip install .' .
+# Sheriff
+Sheriff is a Python incident automation tool that can create Jira tickets, write local incident logs, and send email notifications from a single command.
+It is designed for teams that want a lightweight way to route incidents to multiple outputs (e.g., Jira + log file) using a config-driven workflow.
 
-## Config File (Required)
-A template config file is provided with example groups, which contain the type of platform on which you want the ticket to be created as well as the required credentials. The groups that will be executed are set by the -p option. For Jira, the software will automatically pick up whether you are using Jira Software or Jira core. Use the appropriate password or api_key value based on which service you are using.
+## Features
+- **Jira support** for both Jira Cloud and Jira Server.
+- **Local JSON log output** for incident recordkeeping.
+- **Email notifications** using configured recipient lists.
+- **Config-driven routing**: execute one or more target groups in the same run.
+- **CLI and Python API support**.
 
-## Using as python module
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Usage](#usage)
+  - [CLI](#cli)
+  - [Python API](#python-api)
+- [Output and Behavior](#output-and-behavior)
+- [Troubleshooting](#troubleshooting)
+- [Security Notes](#security-notes)
+
+---
+
+## Requirements
+
+- Python **3.7+** (project metadata currently requires >3.6).
+- Access to your Jira instance (Cloud or Server), if using Jira target groups.
+- A valid YAML configuration file.
+
+---
+
+## Installation
+
+From the repository root:
+```bash
+pip install .
 ```
+
+Optional (recommended):
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install .
+```
+
+---
+
+## Quick Start
+
+1. Create/update your `config.yml`.
+2. Run Sheriff with summary, description, config path, and one or more groups:
+```bash
+incidents \
+  -s "Build pipeline failure" \
+  -d "Deployment failed in stage prod-us-east-1" \
+  -c ./config.yml \
+  -p jira_project mnt-issue_log
+```
+
+---
+
+## Configuration
+
+Sheriff uses a YAML file with named groups. Each group has a `type` (for example `jira` or `log_file`) and the fields required by that type.
+
+---
+
+## Usage
+
+### CLI
+
+```
+incidents -h
+```
+
+Expected options:
+
+- `-s, --summary` (required): short incident summary.
+- `-d, --description` (optional): incident details.
+- `-c, --config` (required): path to YAML config.
+- `-u, --upload_file` (optional): file attachment for Jira issues.
+- `-p, --project_name` (required, one or many): config group names.
+
+### Python API
+
+```python
 from incidents.controller import Controller
 
-#Specify a path to your config file.
-path = os.path.join('Example/path/config.yml')
-Controller(config=path, description= 'Example as module for python.', summary='Python module test for incidents.', groups = ['mnt-issue_log', 'DSS-jira']).load_platform()
-
+Controller(
+    config="/path/to/config.yml",
+    summary="API example incident",
+    description="Triggered from a Python script",
+    groups=["jira_project", "mnt-issue_log"],
+    upload=None,
+).load_platform()
 ```
 
-## Running in command line
-- There are four required options that for creating an issue. Those are summary, description, path to user config file, and project name(s).
-2To get started, use the -h option: `incidents -h`.
+---
 
-Output:
-```
--h, --help            show this help message and exit
--d DESCRIPTION, --description DESCRIPTION
-                      Description of the failure/error.
--s SUMMARY, --summary SUMMARY
-                      Summary for the issue/ticket.
--c config, --path PATH  Path to config file.
--u UPLOAD_FILE, --upload_file UPLOAD_FILE
-                      Path to file for uploading to jira ticket.
--p PROJECT_NAME [PROJECT_NAME ...], --project_name PROJECT_NAME [PROJECT_NAME ...]
-                      Project name for preset information in Config.
-```
+## Output and Behavior
 
-After running the program, you should get the issue id printed on the screen.
+Depending on configured groups, Sheriff can:
 
-## Example Run
+- create a Jira ticket,
+- append a JSON record to a local log file,
+- send an email notification,
+- update statistics data.
 
-```
-$ incidents -s "Testing command line tool." -d "This is an example for the readme." -p "Path to config" -n "Sheriff"
-Expected Output:
-DSS-{Issue_ID}
-```
+If one or more platform actions fail, errors are surfaced to help calling scripts/automation detect failure.
+
+---
+
+## Troubleshooting
+
+- **`ModuleNotFoundError`** for dependencies:
+  - Ensure you installed the package in the active Python environment.
+- **Config parsing errors**:
+  - Validate YAML format and required keys for the selected group type.
+- **Jira authentication failures**:
+  - Verify host URL, user, and API token/password values.
+- **Email issues**:
+  - Validate recipient list sources and local mail command availability.
+
+---
+
+## Security Notes
+- New security method will be implemented in next updates.
+- Do **not** commit credentials (API keys/passwords) to source control.
+- Prefer environment-specific config management (secrets manager, CI variables, etc.).
+- Restrict access to config files containing authentication details.
+
