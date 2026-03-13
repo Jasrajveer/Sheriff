@@ -1,5 +1,0 @@
-# Python temp files
-__pycache__/
-incidents.egg-info/
-*.pyc
-build/
